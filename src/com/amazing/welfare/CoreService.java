@@ -4,7 +4,6 @@ package com.amazing.welfare;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R.integer;
 import android.accessibilityservice.AccessibilityService;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -237,6 +236,13 @@ public class CoreService extends AccessibilityService implements IScreenListener
 
     @Override
     public void onScreenOff() {
-        backHome();
+        openMainActivity();//打开activity，防止后台被杀
+//        backHome();
+    }
+    
+    private void openMainActivity(){ 
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 }
