@@ -1,5 +1,6 @@
 package com.amazing.welfare;
 
+import android.app.IntentService;
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
 import android.app.Service;
@@ -8,7 +9,11 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-public class UnlockScreenService extends Service { 
+public class UnlockScreenService extends IntentService { 
+    public UnlockScreenService(String name) {
+        super(name);
+    }
+
     // 键盘管理器 
     KeyguardManager mKeyguardManager; 
     // 键盘锁 
@@ -37,7 +42,7 @@ public class UnlockScreenService extends Service {
         (PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "bright"); 
         mWakeLock.acquire(); 
         // 初始化键盘锁 
-        mKeyguardLock = mKeyguardManager.newKeyguardLock("unLock"); 
+        mKeyguardLock = mKeyguardManager.newKeyguardLock(""); 
         // 键盘解锁 
         mKeyguardLock.disableKeyguard(); 
     } 
@@ -54,6 +59,11 @@ public class UnlockScreenService extends Service {
         if (mKeyguardLock!=null) { 
             mKeyguardLock.reenableKeyguard(); 
         } 
+    }
+
+    @Override
+    protected void onHandleIntent(Intent arg0) {
+        
     } 
    
 }

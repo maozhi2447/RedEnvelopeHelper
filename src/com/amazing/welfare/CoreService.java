@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 
@@ -62,6 +63,7 @@ public class CoreService extends AccessibilityService{
 		Intent notificationIntent = new Intent(this, CoreService.class);
 		PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(this, "红包助手", isRunning ? "已抢"+counts+"个,点击暂停抢红包服务" :"已暂停抢红包，点击启动", pendingIntent);
+		Toast.makeText(this, isRunning ? "已启动抢红包功能":"已暂停抢红包功能", Toast.LENGTH_SHORT).show();
 		startForeground(101, notification);
 	}
 	
@@ -109,6 +111,14 @@ public class CoreService extends AccessibilityService{
         }
 	}
 
+	private Runnable lockScreen = new Runnable() {
+        
+        @Override
+        public void run() {
+            Intent intent = new Intent(getApplicationContext(), UnlockScreenService.class);
+            stopService(intent);
+        }
+    };
 	/**
 	 * 打开红包
 	 * @param event
@@ -130,6 +140,8 @@ public class CoreService extends AccessibilityService{
 		 } else if("com.tencent.mm.ui.LauncherUI".equals(curClass)) { //聊天界面
 			handler.removeCallbacks(findWalfareRunnable);
 			findWalfareRunnable.run();
+			handler.removeCallbacks(lockScreen);
+			handler.postDelayed(lockScreen, 2000);
 		 }else if("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyPrepareUI".equals(curClass)) { //若是点击发红包页面则清空
 			 clear();
 		 }
