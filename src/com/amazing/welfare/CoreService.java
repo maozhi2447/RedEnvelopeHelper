@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 
-public class CoreService extends AccessibilityService{
+public class CoreService extends AccessibilityService implements IScreenListener{
 
 	private static final String WELFARE_KEY = "[微信红包]";
 	private int counts = 0;
@@ -49,6 +49,8 @@ public class CoreService extends AccessibilityService{
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
+		LockScreenReceiver.getIns().regist(getApplicationContext());//监听屏幕锁屏事件
+		LockScreenReceiver.getIns().setScreenListener(this);
 		startForeground();
 		Util.println("onCreate " );
 	}
@@ -170,6 +172,13 @@ public class CoreService extends AccessibilityService{
 	}
 	
 	
+	private void backHome(){
+        performGlobalAction(AccessibilityService.GLOBAL_ACTION_HOME);  
+        Util.println("backCurrentWindow GLOBAL_ACTION_HOME ");
+
+	}
+	
+	
 	private List<AccessibilityNodeInfo> mClickedWelfareList = new ArrayList<AccessibilityNodeInfo>();
 	private void findWelFare(String key) {
 		AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
@@ -225,4 +234,9 @@ public class CoreService extends AccessibilityService{
 	protected void onServiceConnected() {
 		super.onServiceConnected();
 	}
+
+    @Override
+    public void onScreenOff() {
+        backHome();
+    }
 }
