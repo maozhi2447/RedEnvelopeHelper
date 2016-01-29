@@ -2,7 +2,7 @@
 
 红包助手帮你轻松去抢到群聊红包，而且不影响你的微信聊天哦，点击通知栏也可一键关闭与开启
 
-[**下载最新版本**](https://github.com/maozhi2447/RedEnvelopeHelper/raw/master/release/RedEnvelopeHelper1.0.apk)。
+[**下载最新版本**](https://github.com/maozhi2447/RedEnvelopeHelper/raw/master/release/RedEnvelopeHelper.apk)。
 
 ### 特性
   
