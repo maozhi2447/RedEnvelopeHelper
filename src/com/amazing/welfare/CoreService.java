@@ -4,6 +4,7 @@ package com.amazing.welfare;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.integer;
 import android.accessibilityservice.AccessibilityService;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -12,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
@@ -58,15 +60,19 @@ public class CoreService extends AccessibilityService implements IScreenListener
 		updateNotification();
 	}
 	
+	
 	private void updateNotification(){
 		Notification notification = new Notification(R.drawable.ic_launcher, "红包助手开始运行",
 		        System.currentTimeMillis());
 		Intent notificationIntent = new Intent(this, CoreService.class);
+		
 		PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(this, "红包助手", isRunning ? "已抢"+counts+"个,点击暂停抢红包服务" :"已暂停抢红包，点击启动", pendingIntent);
 		Toast.makeText(this, isRunning ? "已启动抢红包功能":"已暂停抢红包功能", Toast.LENGTH_SHORT).show();
 		startForeground(101, notification);
 	}
+	
+
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -76,7 +82,7 @@ public class CoreService extends AccessibilityService implements IScreenListener
 			isRunning = true;
 		}
 		updateNotification();
-		return super.onStartCommand(intent, flags, startId);
+		return START_STICKY ;
 	}
 	
 	/**
@@ -236,8 +242,11 @@ public class CoreService extends AccessibilityService implements IScreenListener
 
     @Override
     public void onScreenOff() {
-        openMainActivity();//打开activity，防止后台被杀
-//        backHome();
+    	if(!isRunning) {
+			return;
+		}
+//        openMainActivity();//打开activity，防止后台被杀
+        backHome();//当屏幕黑屏时返回到home界面这样下次才能收到微信通知
     }
     
     private void openMainActivity(){ 
