@@ -51,11 +51,11 @@ public class UnlockScreenService extends IntentService {
     @Override 
     public void onDestroy() { 
         super.onDestroy();
-        Util.println("UnlockScreenService onDestroy");
         if (mWakeLock != null) { 
             mWakeLock.release(); 
             mWakeLock = null; 
         } 
+        
         if (mKeyguardLock!=null) { 
             mKeyguardLock.reenableKeyguard(); 
         } 

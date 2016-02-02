@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1、点击下面按钮去开启红包助手辅助功能，每次启动红包助手都需要去开启" />
+            android:text="1、开启红包助手辅助功能则开启了抢红包功能，关闭红包助手辅助功能则关闭了抢红包功能。" />
         <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
@@ -46,14 +46,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="5、如果想抢红包请关闭锁屏" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="6、点击通知栏的红包助手即可开启或关闭抢红包功能。" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="7、红包助手开源地址：https://github.com/maozhi2447/RedEnvelopeHelper" />
+            android:text="6、红包助手开源地址：https://github.com/maozhi2447/RedEnvelopeHelper" />
         <Button
             android:id="@+id/updateBtn"
             android:layout_width="wrap_content"

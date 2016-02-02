@@ -1,25 +1,32 @@
 package com.amazing.welfare;
 
+import java.util.List;
+
+import org.json.JSONObject;
+
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.analytics.onlineconfig.UmengOnlineConfigureListener;
-
-import org.json.JSONObject;
 
 
 
@@ -27,6 +34,9 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
 
 	private Button button = null;
     private Button updateButton = null;
+    private final Intent mAccessibleIntent =
+            new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+    private TextView mServiceStatusView = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,8 +48,7 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                startActivity(intent);
+                startActivity(mAccessibleIntent);
             }
         });
 
@@ -56,15 +65,31 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
     protected void onResume() {
         super.onResume();
         MobclickAgent.onResume(this);
+        updateServiceStatus();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         MobclickAgent.onPause(this);
-
     }
 
+    private void updateServiceStatus() {
+        boolean serviceEnabled = false;
+
+        AccessibilityManager accessibilityManager =
+                (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
+        List<AccessibilityServiceInfo> accessibilityServices =
+                accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
+        for (AccessibilityServiceInfo info : accessibilityServices) {
+            if (info.getId().equals(getPackageName() + "/.CoreService")) {
+                serviceEnabled = true;
+            }
+        }
+        button.setText(serviceEnabled ? "已开启，点击去关闭" : "已停止，点击去开启");
+
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

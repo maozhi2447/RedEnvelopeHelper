@@ -22,7 +22,6 @@ public class CoreService extends AccessibilityService implements IScreenListener
 
 	private static final String WELFARE_KEY = "[微信红包]";
 	private int counts = 0;
-	private boolean isRunning = true;
 	private Handler handler =new Handler(Looper.getMainLooper());
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
@@ -48,12 +47,12 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
 		super.onCreate();
 		LockScreenReceiver.getIns().regist(getApplicationContext());//监听屏幕锁屏事件
 		LockScreenReceiver.getIns().setScreenListener(this);
 		startForeground();
 		Util.println("onCreate " );
+		Toast.makeText(this, "已启动抢红包功能", Toast.LENGTH_SHORT).show();
 	}
 	
 	private void startForeground(){
@@ -64,11 +63,10 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	private void updateNotification(){
 		Notification notification = new Notification(R.drawable.ic_launcher, "红包助手开始运行",
 		        System.currentTimeMillis());
-		Intent notificationIntent = new Intent(this, CoreService.class);
-		
-		PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(this, "红包助手", isRunning ? "已抢"+counts+"个,点击暂停抢红包服务" :"已暂停抢红包，点击启动", pendingIntent);
-		Toast.makeText(this, isRunning ? "已启动抢红包功能":"已暂停抢红包功能", Toast.LENGTH_SHORT).show();
+		Intent notificationIntent = new Intent(this, MainActivity.class);
+		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(this, "红包助手",  "已抢"+counts+"个红包" , pendingIntent);
 		startForeground(101, notification);
 	}
 	
@@ -76,11 +74,6 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if(isRunning ) {
-			isRunning = false;
-		}else {
-			isRunning = true;
-		}
 		updateNotification();
 		return START_STICKY ;
 	}
@@ -132,9 +125,6 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	 */
 	private void weechatWindowChange(AccessibilityEvent event) {
 		if(event == null) {
-			return;
-		}
-		if(!isRunning) {
 			return;
 		}
 		 CharSequence curClass = event.getClassName();
@@ -232,7 +222,15 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	}
 
 	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		Toast.makeText(this, "已停止抢红包功能", Toast.LENGTH_SHORT).show();
+
+	}
+	@Override
 	public void onInterrupt() {
+		Toast.makeText(this, "已停止抢红包功能", Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -242,11 +240,8 @@ public class CoreService extends AccessibilityService implements IScreenListener
 
     @Override
     public void onScreenOff() {
-    	if(!isRunning) {
-			return;
-		}
 //        openMainActivity();//打开activity，防止后台被杀
-        backHome();//当屏幕黑屏时返回到home界面这样下次才能收到微信通知
+//        backHome();//当屏幕黑屏时返回到home界面这样下次才能收到微信通知
     }
     
     private void openMainActivity(){ 
