@@ -11,7 +11,7 @@
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-    <LinearLayout
+   <LinearLayout
         android:id="@+id/linear"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -38,19 +38,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="3、请取消屏蔽可能会发红包的群聊。" />
+   
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="4、请确保红包助手能正常后台运行。" />
+            android:text="4、如果想抢红包请关闭锁屏，接上电源，如果想关闭自动退微信到后台请取消勾选" />
+        <CheckBox 
+		    android:id="@+id/auto" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:text="自动将微信退到后台" 
+   		 /> 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5、如果想抢红包请关闭锁屏，接上电源，运行时可能会主动将微信退到后台" />
-
-        <TextView
+            android:text="5、红包助手开源地址：https://github.com/maozhi2447/RedEnvelopeHelper" />
+        
+         <TextView
+             android:id="@+id/version"
+            android:layout_marginTop="50.dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="6、红包助手开源地址：https://github.com/maozhi2447/RedEnvelopeHelper" />
+            />
         <Button
             android:id="@+id/updateBtn"
             android:layout_width="wrap_content"

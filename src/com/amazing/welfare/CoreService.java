@@ -25,9 +25,12 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	private Handler handler =new Handler(Looper.getMainLooper());
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
+		Util.println(" AccessibilityEvent");
+
 		int type = event.getEventType();
 		switch (type) {
 			case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED://通知栏状态有变化
+				Util.println(" AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED");
 				List<CharSequence> list = event.getText();
 				for (CharSequence charSequence : list) { //遍历温馨通知栏并打开通知
 					if(charSequence.toString().contains(WELFARE_KEY)){
@@ -71,7 +74,7 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	}
 	
 
-	
+	public static boolean isAutoBackWeechat = true;
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		updateNotification();
@@ -145,8 +148,10 @@ public class CoreService extends AccessibilityService implements IScreenListener
 		 } else if("com.tencent.mm.ui.LauncherUI".equals(curClass)) { //聊天界面
 			handler.removeCallbacks(findWalfareRunnable);
 			findWalfareRunnable.run();
-			handler.removeCallbacks(backMain);
-			handler.postDelayed(backMain, 3000);
+			if(isAutoBackWeechat) {
+				handler.removeCallbacks(backMain);
+				handler.postDelayed(backMain, 3000);
+			}
 		 }else if("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyPrepareUI".equals(curClass)) { //若是点击发红包页面则清空
 			 clear();
 		 }

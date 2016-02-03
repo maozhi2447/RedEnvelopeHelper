@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import u.aly.ch;
+
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,6 +24,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +41,8 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
     private Button updateButton = null;
     private final Intent mAccessibleIntent =
             new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-    private TextView mServiceStatusView = null;
+    private CheckBox checkBox = null;
+    private TextView versionTextView = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +57,16 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
                 startActivity(mAccessibleIntent);
             }
         });
+        
+        
+        checkBox = (CheckBox)findViewById(R.id.auto);
+        checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
+				CoreService.isAutoBackWeechat = arg1;
+			}
+		});
 
         updateButton = (Button)findViewById(R.id.updateBtn);
         updateButton.setOnClickListener(new OnClickListener() {
@@ -59,6 +75,9 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
                 checkUpdate();
             }
         });
+        
+        versionTextView = (TextView)findViewById(R.id.version);
+        versionTextView.setText("当前版本：" + Util.getVersionName(this));
     }
 
     @Override
@@ -87,7 +106,7 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
             }
         }
         button.setText(serviceEnabled ? "已开启，点击去关闭" : "已停止，点击去开启");
-
+        checkBox.setChecked(CoreService.isAutoBackWeechat);
     }
     
     @Override

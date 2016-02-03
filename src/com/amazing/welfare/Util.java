@@ -35,6 +35,22 @@ public class Util {
 		}
 		return 10000;
 	}
+	
+	
+	/**
+	 * 获取
+	 * @param context
+	 * @return
+	 */
+	public static String getVersionName(Context context){
+		try {
+			PackageInfo pi=context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+			return pi.versionName;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "1.0";
+	}
 
 	/**
 	 * 判断屏幕是否点亮
