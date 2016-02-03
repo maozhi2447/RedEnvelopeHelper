@@ -119,6 +119,14 @@ public class CoreService extends AccessibilityService implements IScreenListener
             stopService(intent);
         }
     };
+
+	private Runnable backMain = new Runnable() {
+		@Override
+		public void run() {
+			backHome();
+			Toast.makeText(CoreService.this,"红包插件主动出击",Toast.LENGTH_SHORT).show();
+		}
+	};
 	/**
 	 * 打开红包
 	 * @param event
@@ -137,8 +145,8 @@ public class CoreService extends AccessibilityService implements IScreenListener
 		 } else if("com.tencent.mm.ui.LauncherUI".equals(curClass)) { //聊天界面
 			handler.removeCallbacks(findWalfareRunnable);
 			findWalfareRunnable.run();
-			handler.removeCallbacks(lockScreen);
-			handler.postDelayed(lockScreen, 2000);
+			handler.removeCallbacks(backMain);
+			handler.postDelayed(backMain, 3000);
 		 }else if("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyPrepareUI".equals(curClass)) { //若是点击发红包页面则清空
 			 clear();
 		 }
