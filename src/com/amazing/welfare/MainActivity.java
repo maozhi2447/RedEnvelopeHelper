@@ -12,7 +12,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,6 +28,7 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +45,10 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
     private final Intent mAccessibleIntent =
             new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
     private CheckBox checkBox = null;
+    private CheckBox myself = null;
+    private CheckBox replay = null;
     private TextView versionTextView = null;
+    private EditText editText = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,13 +67,50 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
         
         checkBox = (CheckBox)findViewById(R.id.auto);
         checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
+                CoreService.isAutoBackWeechat = arg1;
+            }
+        });
+        
+        myself = (CheckBox)findViewById(R.id.myself);
+        myself.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			
 			@Override
 			public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
-				CoreService.isAutoBackWeechat = arg1;
+				CoreService.isOpenMyself = arg1;
 			}
 		});
+        
 
+
+
+        
+
+        editText = (EditText)findViewById(R.id.edit);
+        editText.setSingleLine(true);
+        editText.setText(getReplay());
+
+
+        replay = (CheckBox)findViewById(R.id.replay);
+        if(Build.VERSION.SDK_INT < 18) { //低于API18无法开启自动回复功能
+            replay.setChecked(false);
+            CoreService.isAutoReplay = false;
+            replay.setEnabled(false);
+            TextView textView = (TextView)findViewById(R.id.check);
+            textView.setText("android4.3以上才支持自动回复功能");
+            editText.setEnabled(false);
+        }else {
+            replay.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+                @Override
+                public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
+                    CoreService.isAutoReplay = arg1;
+                }
+            });
+        }
+        
         updateButton = (Button)findViewById(R.id.updateBtn);
         updateButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -80,6 +123,23 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
         versionTextView.setText("当前版本：" + Util.getVersionName(this));
     }
 
+    
+    private String getReplay(){
+    	SharedPreferences sharedPreferences = getSharedPreferences("replay", Context.MODE_PRIVATE);
+    	return sharedPreferences.getString("key", "多谢老板，棒棒哒！");
+    }
+    
+    private void saveReplay(){
+    	SharedPreferences sharedPreferences = getSharedPreferences("replay", Context.MODE_PRIVATE);
+    	SharedPreferences.Editor editor = sharedPreferences.edit();
+    	if(editText.getText() != null) {
+    		String str = editText.getText().toString();
+    		CoreService.autoString = str;
+        	editor.putString("key", str);
+    	}
+    	editor.commit();
+    }
+    
     @Override
     protected void onResume() {
         super.onResume();
@@ -91,6 +151,7 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
     protected void onPause() {
         super.onPause();
         MobclickAgent.onPause(this);
+        saveReplay();
     }
 
     private void updateServiceStatus() {
@@ -107,6 +168,9 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
         }
         button.setText(serviceEnabled ? "已开启，点击去关闭" : "已停止，点击去开启");
         checkBox.setChecked(CoreService.isAutoBackWeechat);
+        replay.setChecked(CoreService.isAutoReplay);
+        myself.setChecked(CoreService.isOpenMyself);
+
     }
     
     @Override

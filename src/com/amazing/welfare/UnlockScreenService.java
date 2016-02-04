@@ -29,7 +29,7 @@ public class UnlockScreenService extends IntentService {
     } 
    
     @Override 
-    public void onCreate() { 
+    public void onCreate() {
         super.onCreate(); 
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE); 
         mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE); 

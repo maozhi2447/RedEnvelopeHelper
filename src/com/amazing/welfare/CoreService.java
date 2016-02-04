@@ -4,16 +4,20 @@ package com.amazing.welfare;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R.integer;
 import android.accessibilityservice.AccessibilityService;
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
@@ -23,9 +27,17 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	private static final String WELFARE_KEY = "[微信红包]";
 	private int counts = 0;
 	private Handler handler =new Handler(Looper.getMainLooper());
+	public static boolean isAutoBackWeechat = false;
+	public static String autoString = "";
+	public static boolean isOpenMyself = true;
+	public static boolean isAutoReplay = true;
+	private boolean isSuspend = false;
+	
 	@Override
 	public void onAccessibilityEvent(AccessibilityEvent event) {
-		Util.println(" AccessibilityEvent");
+		if(isSuspend) {
+			return;
+		}
 
 		int type = event.getEventType();
 		switch (type) {
@@ -53,32 +65,28 @@ public class CoreService extends AccessibilityService implements IScreenListener
 		super.onCreate();
 		LockScreenReceiver.getIns().regist(getApplicationContext());//监听屏幕锁屏事件
 		LockScreenReceiver.getIns().setScreenListener(this);
-		startForeground();
-		Util.println("onCreate " );
+		updateNotification();
+		Util.println("onCreate ");
 		Toast.makeText(this, "已启动抢红包功能", Toast.LENGTH_SHORT).show();
 	}
-	
-	private void startForeground(){
-		updateNotification();
-	}
-	
+
 	
 	private void updateNotification(){
 		Notification notification = new Notification(R.drawable.ic_launcher, "红包助手开始运行",
 		        System.currentTimeMillis());
-		Intent notificationIntent = new Intent(this, MainActivity.class);
-		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(this, "红包助手",  "已抢"+counts+"个红包" , pendingIntent);
+		Intent notificationIntent = new Intent(this, CoreService.class);
+		notificationIntent.setFlags(5);
+		PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
+		notificationIntent.putExtra("key", "key");
+		notification.setLatestEventInfo(this, "红包助手", isSuspend?"已暂停，点击恢复抢红包": "已抢" + counts + "个红包,点击暂停", pendingIntent);
 		startForeground(101, notification);
 	}
 	
-
-	public static boolean isAutoBackWeechat = true;
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		isSuspend = !isSuspend;
 		updateNotification();
-		return START_STICKY ;
+		return super.onStartCommand(intent,flags,startId) ;
 	}
 	
 	/**
@@ -114,20 +122,11 @@ public class CoreService extends AccessibilityService implements IScreenListener
         }
 	}
 
-	private Runnable lockScreen = new Runnable() {
-        
-        @Override
-        public void run() {
-            Intent intent = new Intent(getApplicationContext(), UnlockScreenService.class);
-            stopService(intent);
-        }
-    };
-
 	private Runnable backMain = new Runnable() {
 		@Override
 		public void run() {
 			backHome();
-			Toast.makeText(CoreService.this,"红包插件主动出击",Toast.LENGTH_SHORT).show();
+			Toast.makeText(CoreService.this,"将微信退到后台，可以在红包助手设置",Toast.LENGTH_SHORT).show();
 		}
 	};
 	/**
@@ -139,8 +138,7 @@ public class CoreService extends AccessibilityService implements IScreenListener
 			return;
 		}
 		 CharSequence curClass = event.getClassName();
-     	Util.println("weechatWindowChange " + curClass);
-
+     	 Util.println("weechatWindowChange " + curClass);
 		 if("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyReceiveUI".equals(curClass)) { //弹出红包界面
 			openWelfare();
 		 } else if("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(curClass)) { //红包详情页面
@@ -152,6 +150,11 @@ public class CoreService extends AccessibilityService implements IScreenListener
 				handler.removeCallbacks(backMain);
 				handler.postDelayed(backMain, 3000);
 			}
+			
+			if(isGetWelf && isAutoReplay ) { //如果拆了红包且回到聊天界面时自动回复。
+				sayThanks();
+			}
+			
 		 }else if("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyPrepareUI".equals(curClass)) { //若是点击发红包页面则清空
 			 clear();
 		 }
@@ -168,7 +171,9 @@ public class CoreService extends AccessibilityService implements IScreenListener
 		@Override
 		public void run() {
 			 findWelFare("领取红包");
-			 findWelFare("查看红包");
+			 if(isOpenMyself) {
+				 findWelFare("查看红包");
+			 }
 		}
 	};
 	/**
@@ -210,13 +215,14 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	}
 	
 
+	private boolean isGetWelf = false;
 	private void openWelfare() {
 		AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if (nodeInfo == null) {  
         	Util.println("findWelFare openWelfare null");
             return;  
         }
-
+        
         /**
          * 由于android api18(4.4)才支持findAccessibilityNodeInfosByViewId(),为了适配更多的机型采用如此方法
          */
@@ -227,13 +233,78 @@ public class CoreService extends AccessibilityService implements IScreenListener
         		counts++;
 				MobclickAgent.onEvent(this,"openWelfare");
         		updateNotification();
+        		isGetWelf = true;
         		return;
         	}
 		}
         //若是下手慢了则自动退出当前
         backCurrentWindow();
 	}
+	
+	boolean isFindEdit = false;
+	/**
+	 * 自动回复
+	 */
+	private void sayThanks(){
+		if(TextUtils.isEmpty(autoString)) {
+			Toast.makeText(this, "红包助手自动回复为空", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		isGetWelf = false;
+		final AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
+		isFindEdit = false;
+		parste(nodeInfo);
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				clickSend();
+			}
+		}, 200);
+	}
+	
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2) 
+	private void parste(AccessibilityNodeInfo nodeInfo){
+		if (isFindEdit) {
+			return ;
+		}
+	      for (int i = 0 ;i < nodeInfo.getChildCount(); ++i) {
+	        	AccessibilityNodeInfo info = nodeInfo.getChild(i);
+	        	if(info != null) {
+	            	if(info.getChildCount() > 0) {
+	            		parste(info);
+		        	}else {
+		        	   	if("android.widget.EditText".equals(info.getClassName())){
+		        	   		ClipboardManager clipboard =  (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+		        	   		clipboard.setText(autoString);
+		        	   		info.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+		        	   		info.performAction(AccessibilityNodeInfo.ACTION_PASTE);
+			        		isFindEdit = true;
+			        		return;
+			        	}
+					}
+	        	}
+			}
+	}
+	
 
+	private void clickSend(){
+		AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
+        if (nodeInfo == null) {  
+        	Util.println("clickSend clickSend null");
+            return;  
+        }
+        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("发送");
+        for (AccessibilityNodeInfo nodepar : list) {
+        	if(nodepar != null) {
+           	 if(nodepar != null) {
+	        		Util.println("发送clickSend送");
+	        		nodepar.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+                 	nodepar.performAction(AccessibilityNodeInfo.ACTION_CLICK);  
+           	 }
+        	}
+		}
+	}
+	
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub

@@ -49,10 +49,36 @@
 		    android:layout_height="wrap_content" 
 		    android:text="自动将微信退到后台" 
    		 /> 
+   		 <CheckBox 
+		    android:id="@+id/myself" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:text="抢自己发的红包" 
+   		 />
+       <TextView
+           android:id="@+id/check"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text=""/>
+   		  <CheckBox 
+		    android:id="@+id/replay" 
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content" 
+		    android:text="自动回复" 
+   		 /> 
+   		 <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="自动回复内容：" />
+   		 <EditText 
+   		      android:layout_width="match_parent"
+  			  android:layout_height="wrap_content"
+             android:id="@+id/edit"
+   		     />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5、红包助手开源地址：https://github.com/maozhi2447/RedEnvelopeHelper" />
+            android:text="红包助手开源地址：https://github.com/maozhi2447/RedEnvelopeHelper" />
         
          <TextView
              android:id="@+id/version"
