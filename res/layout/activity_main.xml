@@ -37,17 +37,21 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3、请取消屏蔽可能会发红包的群聊。" />
+            android:text="3、请取消屏蔽可能会发红包的群聊。\n" />
    
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="4、如果想抢红包请关闭锁屏，接上电源，如果想关闭自动退微信到后台请取消勾选" />
-        <CheckBox 
+            android:text="4、如果想睡觉抢红包，请接上电源在开发者模式打开充电时不休眠，如果想不错过任何红包请开启自动将微信退后台（推荐在不玩微信时启用）\n" />
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="5、下拉通知栏可以快速暂停或恢复抢红包功能\n" />
+        <CheckBox
 		    android:id="@+id/auto" 
 		    android:layout_width="wrap_content" 
 		    android:layout_height="wrap_content" 
-		    android:text="自动将微信退到后台" 
+		    android:text="自动将微信退到后台"
    		 /> 
    		 <CheckBox 
 		    android:id="@+id/myself" 
@@ -69,20 +73,59 @@
    		 <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="自动回复内容：" />
+            android:text="自动回复内容1：" />
    		 <EditText 
    		      android:layout_width="match_parent"
   			  android:layout_height="wrap_content"
              android:id="@+id/edit"
    		     />
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="自动回复内容2：" />
+       <EditText
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:id="@+id/edit2"
+           />
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="自动回复内容3：" />
+       <EditText
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:id="@+id/edit3"
+           />
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="自动回复内容4：" />
+       <EditText
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:id="@+id/edit4"
+           />
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="自动回复内容5：" />
+       <EditText
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:id="@+id/edit5"
+           />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="红包助手开源地址：https://github.com/maozhi2447/RedEnvelopeHelper" />
-        
+            android:text="红包助手开源地址：https://github.com/maozhi2447/RedEnvelopeHelper\n" />
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textColor="#ff0000"
+           android:text="（红包助手并未上线商店市场，谨献给我亲爱的朋友们，祝你们新春快乐,幸福安康\n       毛智 2016.02.05）\n" />
          <TextView
              android:id="@+id/version"
-            android:layout_marginTop="50.dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             />

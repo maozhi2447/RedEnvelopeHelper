@@ -3,6 +3,7 @@ package com.amazing.welfare;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.TargetApi;
@@ -29,6 +30,10 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	private Handler handler =new Handler(Looper.getMainLooper());
 	public static boolean isAutoBackWeechat = false;
 	public static String autoString = "";
+	public static String autoString2 = "";
+	public static String autoString3 = "";
+	public static String autoString4 = "";
+	public static String autoString5 = "";
 	public static boolean isOpenMyself = true;
 	public static boolean isAutoReplay = true;
 	private boolean isSuspend = false;
@@ -240,20 +245,54 @@ public class CoreService extends AccessibilityService implements IScreenListener
         //若是下手慢了则自动退出当前
         backCurrentWindow();
 	}
-	
-	boolean isFindEdit = false;
+
+	/**
+	 * 获取随机索引
+	 * @return
+	 */
+	private int getRandomIndex(){
+		Random random = new Random();
+		return  random.nextInt(5) +1;
+	}
+
+	public String getRandomSay(){
+		String say = "";
+		int random = getRandomIndex();
+		switch (random) {
+			case 1:
+				say = autoString;
+				break;
+			case 2:
+				say = autoString2;
+				break;
+			case 3:
+				say = autoString3;
+				break;
+			case 4:
+				say = autoString4;
+				break;
+			case 5:
+				say = autoString5;
+				break;
+		}
+		return say;
+	}
+
+
+	private boolean isFindEdit = false;
 	/**
 	 * 自动回复
 	 */
 	private void sayThanks(){
-		if(TextUtils.isEmpty(autoString)) {
+		String say = getRandomSay();
+		if(TextUtils.isEmpty(say)) {
 			Toast.makeText(this, "红包助手自动回复为空", Toast.LENGTH_SHORT).show();
 			return;
 		}
 		isGetWelf = false;
 		final AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
 		isFindEdit = false;
-		parste(nodeInfo);
+		parste(nodeInfo,say);
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -263,19 +302,20 @@ public class CoreService extends AccessibilityService implements IScreenListener
 	}
 	
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2) 
-	private void parste(AccessibilityNodeInfo nodeInfo){
+	private void parste(AccessibilityNodeInfo nodeInfo, String say){
 		if (isFindEdit) {
 			return ;
 		}
+		if(nodeInfo == null) return;
 	      for (int i = 0 ;i < nodeInfo.getChildCount(); ++i) {
 	        	AccessibilityNodeInfo info = nodeInfo.getChild(i);
 	        	if(info != null) {
 	            	if(info.getChildCount() > 0) {
-	            		parste(info);
+	            		parste(info,say);
 		        	}else {
 		        	   	if("android.widget.EditText".equals(info.getClassName())){
 		        	   		ClipboardManager clipboard =  (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-		        	   		clipboard.setText(autoString);
+		        	   		clipboard.setText(say);
 		        	   		info.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
 		        	   		info.performAction(AccessibilityNodeInfo.ACTION_PASTE);
 			        		isFindEdit = true;

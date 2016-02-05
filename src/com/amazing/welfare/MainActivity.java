@@ -1,11 +1,5 @@
 package com.amazing.welfare;
 
-import java.util.List;
-
-import org.json.JSONObject;
-
-import u.aly.ch;
-
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,13 +22,17 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.analytics.onlineconfig.UmengOnlineConfigureListener;
+
+import org.json.JSONObject;
+
+import java.util.List;
 
 
 
@@ -49,6 +47,11 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
     private CheckBox replay = null;
     private TextView versionTextView = null;
     private EditText editText = null;
+    private EditText editText2 = null;
+    private EditText editText3 = null;
+    private EditText editText4 = null;
+    private EditText editText5 = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,13 +87,25 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
 		});
         
 
-
-
-        
-
         editText = (EditText)findViewById(R.id.edit);
         editText.setSingleLine(true);
-        editText.setText(getReplay());
+        editText.setText(getReplay(1));
+
+        editText2 = (EditText)findViewById(R.id.edit2);
+        editText2.setSingleLine(true);
+        editText2.setText(getReplay(2));
+
+        editText3 = (EditText)findViewById(R.id.edit3);
+        editText3.setSingleLine(true);
+        editText3.setText(getReplay(3));
+
+        editText4 = (EditText)findViewById(R.id.edit4);
+        editText4.setSingleLine(true);
+        editText4.setText(getReplay(4));
+
+        editText5 = (EditText)findViewById(R.id.edit5);
+        editText5.setSingleLine(true);
+        editText5.setText(getReplay(5));
 
 
         replay = (CheckBox)findViewById(R.id.replay);
@@ -123,20 +138,58 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
         versionTextView.setText("当前版本：" + Util.getVersionName(this));
     }
 
-    
-    private String getReplay(){
+    private String getReplay(int id){
     	SharedPreferences sharedPreferences = getSharedPreferences("replay", Context.MODE_PRIVATE);
-    	return sharedPreferences.getString("key", "多谢老板，棒棒哒！");
+        String str = "";
+        switch (id) {
+            case 1:
+                str = sharedPreferences.getString("key" + id, "多谢老板，棒棒哒！");
+                break;
+            case 2:
+                str = sharedPreferences.getString("key" + id, "终于抢到了，不容易啊！");
+                break;
+            case 3:
+                str = sharedPreferences.getString("key" + id, "蚊子腿也是肉呀。");
+                break;
+            case 4:
+                str = sharedPreferences.getString("key" + id, "努力抢红包攒苹果6！");
+                break;
+            case 5:
+                str = sharedPreferences.getString("key" + id, "谢谢");
+                break;
+        }
+    	return str;
     }
-    
-    private void saveReplay(){
+
+
+    private void saveReplay(int id){
     	SharedPreferences sharedPreferences = getSharedPreferences("replay", Context.MODE_PRIVATE);
     	SharedPreferences.Editor editor = sharedPreferences.edit();
-    	if(editText.getText() != null) {
-    		String str = editText.getText().toString();
-    		CoreService.autoString = str;
-        	editor.putString("key", str);
-    	}
+    		String str = "";
+            switch (id) {
+                case 1:
+                    str =editText.getText().toString();
+                    CoreService.autoString = str;
+                    break;
+                case 2:
+                    str =editText2.getText().toString();
+                    CoreService.autoString2 = str;
+                    break;
+                case 3:
+                    str =editText3.getText().toString();
+                    CoreService.autoString3 = str;
+                    break;
+                case 4:
+                    str =editText4.getText().toString();
+                    CoreService.autoString4 = str;
+                    break;
+                case 5:
+                    str =editText5.getText().toString();
+                    CoreService.autoString5 = str;
+                    break;
+            }
+        	editor.putString("key" + id, str);
+
     	editor.commit();
     }
     
@@ -151,7 +204,11 @@ public class MainActivity extends Activity implements UmengOnlineConfigureListen
     protected void onPause() {
         super.onPause();
         MobclickAgent.onPause(this);
-        saveReplay();
+        saveReplay(1);
+        saveReplay(2);
+        saveReplay(3);
+        saveReplay(4);
+        saveReplay(5);
     }
 
     private void updateServiceStatus() {
